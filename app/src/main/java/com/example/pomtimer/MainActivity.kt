@@ -1,31 +1,19 @@
 package com.example.pomtimer
 
 import android.os.Bundle
-import android.widget.ProgressBar
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
-import androidx.compose.material.ProgressIndicatorDefaults.ProgressAnimationSpec
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.PaintingStyle.Companion.Stroke
-import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.input.key.Key.Companion.Window
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.*
@@ -50,17 +38,18 @@ fun Main()  {
 
     LaunchedEffect(isRunning) {
         if (isRunning) {
-            while (minutes > 0 || seconds > 0) {
+            while (minutes >= 0 || seconds > 0) {
                 delay(1000)
                 if (seconds > 0) {
                     seconds--
-                } else if (minutes > 0) {
+                } else if (minutes >= 0) {
                     minutes--
                     seconds = 59
                 }
             }
-            minutes = 1
         }
+        isRunning = false
+
     }
 
     MaterialTheme {
@@ -74,19 +63,22 @@ fun Main()  {
 
             Row (modifier = Modifier.fillMaxWidth()){
                 Button(onClick = {
-                    minutes = 24
-                    seconds = 59
+                    minutes = 25
+                    seconds = 0
+                    isRunning = false
                 }, modifier = Modifier.padding(horizontal = 10.dp)) {
                    Text("Pomodoro")
                 }
                 Button(onClick = {
-                                 minutes = 4
-                    seconds = 59
+                                 minutes = 5
+                    seconds = 0
+                    isRunning = false
                 }, modifier = Modifier.padding(horizontal = 10.dp)) {
                     Text("Short break")
                 }
-                Button(onClick = {minutes = 14
-                                 seconds = 59}, modifier = Modifier.padding(horizontal = 10.dp)) {
+                Button(onClick = {minutes = 15
+                                 seconds = 0
+                    isRunning = false}, modifier = Modifier.padding(horizontal = 10.dp)) {
                     Text("Long break")
                 }
             }
@@ -96,12 +88,7 @@ fun Main()  {
                     .clip(CircleShape)
                     .padding(8.dp)
             ) {
-                drawArc(
-                    color = Color.Gray,
-                    startAngle = -90f,
-                    sweepAngle = 360f,
-                    useCenter = false,
-                )
+
                 val totalSeconds = minutes * 60 + seconds
             }
             Row(
@@ -118,37 +105,79 @@ fun Main()  {
                     Button(onClick = { isRunning = false }) {
                         Text(text = "Stop")
                     }
-                } else {
-                    Button(onClick = { isRunning = true }) {
-                        Text(text = "Start")
-                    }
-                }
-            }
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()
-            ){
-                TaskbarList(5)
+            } else {
+            Button(onClick = { isRunning = true }) {
+                Text(text = "Start")
             }
         }
-    }
+        }
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight()
+        ){
+            TaskbarList(
+                taskItemList = listOf<Task>(
+                    Task(0, UUID.randomUUID().toString(),"", true),
+                    Task(1, UUID.randomUUID().toString(),"", true)
+                            ,Task(1, UUID.randomUUID().toString(),"", true)
+                    )
+                )
+            }
+        }
+}
 }
 
-    @Composable
-    fun TaskbarList(items: Int){
-        LazyColumn {
-
+@Composable
+    fun TaskbarList(taskItemList: List<Task>){
+        Column {
+            for(i in taskItemList){
+                TaskItem(itemId = i.getItemId(), itemName = i.getItemName(), itemDescription = i.getItemDescription(), isItemFinished = i.getIsItemFinished())
+            }
         }
     }
 
-    @Composable
-    fun TaskItem(itemName: String) {
+class Task(itemId: Int, itemName: String, itemDescription: String, isItemFinished: Boolean) {
+    private var itemId: Int
+    private var itemName: String
+    private var itemDescription: String
+    private var isItemFinished: Boolean
 
+    init {
+        this.itemId = itemId
+        this.itemName = itemName
+        this.itemDescription = itemDescription
+        this.isItemFinished = isItemFinished
+    }
+
+
+    fun getItemId (): Int{
+        return this.itemId
+    }
+
+    fun getItemName(): String{
+        return this.itemName
+    }
+
+    fun getItemDescription(): String{
+        return this.itemDescription
+    }
+    fun getIsItemFinished(): Boolean{
+        return this.isItemFinished
+    }
+}
+    @Composable
+    fun TaskItem(itemId: Int, itemName: String, itemDescription: String, isItemFinished: Boolean) {
         Row(modifier = Modifier
-            .fillMaxHeight()
-            .fillMaxWidth()){
-            Text(itemName)
+            .height(100.dp)
+            .fillMaxWidth()
+            .padding(10.dp)
+            .background(color = Color.Yellow)
+        ){
+            Text("$itemId")
+            Column(modifier = Modifier.fillMaxSize()) {
+
+            }
         }
     }
 
