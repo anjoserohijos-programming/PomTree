@@ -47,10 +47,7 @@ fun Main()  {
                     seconds = 59
                 }
             }
-<<<<<<< HEAD
-=======
             isRunning = false
->>>>>>> refs/remotes/origin/main
         }
         isRunning = false
 
