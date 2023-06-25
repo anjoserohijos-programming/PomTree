@@ -88,13 +88,18 @@ fun Main()  {
                     .clip(CircleShape)
                     .padding(8.dp)
             ) {
+                //dito banda yung tree growth algorithm eyy
+                //tree growth based dun sa value ng progressbar
 
+                //cc: marc
                 val totalSeconds = minutes * 60 + seconds
             }
             Row(
                 modifier = Modifier.padding(top = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                //dito banda yung progress bar, progress ng task list na nakacheck
+                //cc: anjo
                 Text(
                     text = "%02d:%02d".format(minutes, seconds),
                     fontSize = 48.sp,
@@ -116,6 +121,7 @@ fun Main()  {
                 .fillMaxWidth()
                 .fillMaxHeight()
         ){
+            // TASKS
             TaskbarList(
                 taskItemList = listOf<Task>(
                     Task(0, UUID.randomUUID().toString(),"", true),
@@ -150,7 +156,6 @@ class Task(itemId: Int, itemName: String, itemDescription: String, isItemFinishe
         this.isItemFinished = isItemFinished
     }
 
-
     fun getItemId (): Int{
         return this.itemId
     }
@@ -174,9 +179,12 @@ class Task(itemId: Int, itemName: String, itemDescription: String, isItemFinishe
             .padding(10.dp)
             .background(color = Color.Yellow)
         ){
+
             Text("$itemId")
             Column(modifier = Modifier.fillMaxSize()) {
-
+                //dito yung designnn ng Task Item
+                //mga variables nyoo is itemId, itemName, itemDescription, tas isItemFinished
+                //cc: shaira & JC uwuuu
             }
         }
     }
