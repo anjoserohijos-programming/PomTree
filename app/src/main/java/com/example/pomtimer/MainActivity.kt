@@ -69,14 +69,18 @@ fun Main()  {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            TextField(
-                value = minutes.toString(),
-                onValueChange = { value ->
-                    minutes = value.toIntOrNull() ?: 0
-                },
-                label = { Text("Minutes") },
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
+
+            Row (modifier = Modifier.fillMaxWidth()){
+                Button(onClick = { /*TODO*/ }, modifier = Modifier.padding(horizontal = 10.dp)) {
+                   Text("Pomodoro")
+                }
+                Button(onClick = { /*TODO*/ }, modifier = Modifier.padding(horizontal = 10.dp)) {
+                    Text("Short break")
+                }
+                Button(onClick = { /*TODO*/ }, modifier = Modifier.padding(horizontal = 10.dp)) {
+                    Text("Long break")
+                }
+            }
             Canvas(
                 modifier = Modifier
                     .size(200.dp)
