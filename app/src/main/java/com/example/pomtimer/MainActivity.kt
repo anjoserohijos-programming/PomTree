@@ -69,6 +69,14 @@ fun Main()  {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            TextField(
+                value = minutes.toString(),
+                onValueChange = { value ->
+                    minutes = value.toIntOrNull() ?: 0
+                },
+                label = { Text("Minutes") },
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
             Canvas(
                 modifier = Modifier
                     .size(200.dp)
@@ -81,14 +89,7 @@ fun Main()  {
                     sweepAngle = 360f,
                     useCenter = false,
                 )
-                val angle = 360 * (minutes * 60 + seconds) / (5 * 60)
-                drawArc(
-                    color = Color.Green,
-                    startAngle = -90f,
-                    sweepAngle = angle.toFloat(),
-                    useCenter = false,
-                    style = Stroke(width = 12f)
-                )
+                val totalSeconds = minutes * 60 + seconds
             }
             Row(
                 modifier = Modifier.padding(top = 16.dp),
