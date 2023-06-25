@@ -8,6 +8,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -28,6 +29,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.*
+import java.util.UUID
 
 class MainActivity : AppCompatActivity() {
 
@@ -69,6 +71,25 @@ fun Main()  {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
+            Row (modifier = Modifier.fillMaxWidth()){
+                Button(onClick = {
+                    minutes = 24
+                    seconds = 59
+                }, modifier = Modifier.padding(horizontal = 10.dp)) {
+                   Text("Pomodoro")
+                }
+                Button(onClick = {
+                                 minutes = 4
+                    seconds = 59
+                }, modifier = Modifier.padding(horizontal = 10.dp)) {
+                    Text("Short break")
+                }
+                Button(onClick = {minutes = 14
+                                 seconds = 59}, modifier = Modifier.padding(horizontal = 10.dp)) {
+                    Text("Long break")
+                }
+            }
             Canvas(
                 modifier = Modifier
                     .size(200.dp)
@@ -81,14 +102,7 @@ fun Main()  {
                     sweepAngle = 360f,
                     useCenter = false,
                 )
-                val angle = 360 * (minutes * 60 + seconds) / (5 * 60)
-                drawArc(
-                    color = Color.Green,
-                    startAngle = -90f,
-                    sweepAngle = angle.toFloat(),
-                    useCenter = false,
-                    style = Stroke(width = 12f)
-                )
+                val totalSeconds = minutes * 60 + seconds
             }
             Row(
                 modifier = Modifier.padding(top = 16.dp),
@@ -110,6 +124,31 @@ fun Main()  {
                     }
                 }
             }
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+            ){
+                TaskbarList(5)
+            }
         }
     }
 }
+
+    @Composable
+    fun TaskbarList(items: Int){
+        LazyColumn {
+
+        }
+    }
+
+    @Composable
+    fun TaskItem(itemName: String) {
+
+        Row(modifier = Modifier
+            .fillMaxHeight()
+            .fillMaxWidth()){
+            Text(itemName)
+        }
+    }
+
