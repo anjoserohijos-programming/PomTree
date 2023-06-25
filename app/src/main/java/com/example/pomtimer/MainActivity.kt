@@ -25,7 +25,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             Main()
-
         }
     }
 }
@@ -47,10 +46,7 @@ fun Main()  {
                     seconds = 59
                 }
             }
-<<<<<<< HEAD
-=======
             isRunning = false
->>>>>>> e2b520bf0be9164164c9654275b623998e44779b
         }
         isRunning = false
 
