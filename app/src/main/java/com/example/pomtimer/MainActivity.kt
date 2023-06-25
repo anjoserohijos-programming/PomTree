@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity() {
 
 @Composable
 fun Main()  {
-    var minutes by remember { mutableStateOf(5) }
+    var minutes by remember { mutableStateOf(2) }
     var seconds by remember { mutableStateOf(0) }
     var isRunning by remember { mutableStateOf(false) }
 
@@ -52,12 +52,12 @@ fun Main()  {
                 delay(1000)
                 if (seconds > 0) {
                     seconds--
-                } else if (minutes > 0) {
+                } else if (minutes >= 0) {
                     minutes--
                     seconds = 59
                 }
             }
-            minutes = 1
+            isRunning = false
         }
     }
 
