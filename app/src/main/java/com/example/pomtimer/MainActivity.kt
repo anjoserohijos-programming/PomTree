@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity() {
 
 @Composable
 fun Main()  {
-    var minutes by remember { mutableStateOf(5) }
+    var minutes by remember { mutableStateOf(2) }
     var seconds by remember { mutableStateOf(0) }
     var isRunning by remember { mutableStateOf(false) }
 
@@ -47,6 +47,10 @@ fun Main()  {
                     seconds = 59
                 }
             }
+<<<<<<< HEAD
+=======
+            isRunning = false
+>>>>>>> e2b520bf0be9164164c9654275b623998e44779b
         }
         isRunning = false
 
