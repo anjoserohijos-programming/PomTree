@@ -6,7 +6,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -34,7 +37,8 @@ fun Main()  {
     var minutes by remember { mutableStateOf(2) }
     var seconds by remember { mutableStateOf(0) }
     var isRunning by remember { mutableStateOf(false) }
-
+    val taskItemList = mutableListOf<Task>()
+    var progress = remember { mutableStateOf(taskItemList.size) }
     LaunchedEffect(isRunning) {
         if (isRunning) {
             while (minutes >= 0 || seconds > 0) {
@@ -66,19 +70,19 @@ fun Main()  {
                     minutes = 25
                     seconds = 0
                     isRunning = false
-                }, modifier = Modifier.padding(horizontal = 10.dp)) {
+                }) {
                    Text("Pomodoro")
                 }
                 Button(onClick = {
                                  minutes = 5
                     seconds = 0
                     isRunning = false
-                }, modifier = Modifier.padding(horizontal = 10.dp)) {
+                }) {
                     Text("Short break")
                 }
                 Button(onClick = {minutes = 15
                                  seconds = 0
-                    isRunning = false}, modifier = Modifier.padding(horizontal = 10.dp)) {
+                    isRunning = false}) {
                     Text("Long break")
                 }
             }
@@ -116,48 +120,47 @@ fun Main()  {
             }
         }
         }
+        Row(modifier = Modifier.fillMaxWidth()) {
+            Text(text = "Tasks: 0/${progress.value}")
+            Button(onClick = {
+                taskItemList.add(Task(itemName = UUID.randomUUID().toString(), itemDescription = "SampleDesc", isItemFinished = false))
+            }){
+                Text(text = "+")
+            }
+            LinearProgressIndicator(
+
+            )
+        }
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight()
         ){
-            // TASKS
-            TaskbarList(
-                taskItemList = listOf<Task>(
-                    Task(0, UUID.randomUUID().toString(),"", true),
-                    Task(1, UUID.randomUUID().toString(),"", true)
-                            ,Task(1, UUID.randomUUID().toString(),"", true)
-                    )
-                )
-            }
+            TaskbarList(taskItemList = taskItemList)
+        }
         }
 }
 }
 
 @Composable
     fun TaskbarList(taskItemList: List<Task>){
-        Column {
+    val scrollState = rememberScrollState()
+        Column (modifier = Modifier.verticalScroll(scrollState)){
             for(i in taskItemList){
-                TaskItem(itemId = i.getItemId(), itemName = i.getItemName(), itemDescription = i.getItemDescription(), isItemFinished = i.getIsItemFinished())
+                TaskItem(itemName = i.getItemName(), itemDescription = i.getItemDescription(), isItemFinished = i.getIsItemFinished())
             }
         }
     }
 
-class Task(itemId: Int, itemName: String, itemDescription: String, isItemFinished: Boolean) {
-    private var itemId: Int
+class Task(itemName: String, itemDescription: String, isItemFinished: Boolean) {
     private var itemName: String
     private var itemDescription: String
     private var isItemFinished: Boolean
 
     init {
-        this.itemId = itemId
         this.itemName = itemName
         this.itemDescription = itemDescription
         this.isItemFinished = isItemFinished
-    }
-
-    fun getItemId (): Int{
-        return this.itemId
     }
 
     fun getItemName(): String{
@@ -172,15 +175,13 @@ class Task(itemId: Int, itemName: String, itemDescription: String, isItemFinishe
     }
 }
     @Composable
-    fun TaskItem(itemId: Int, itemName: String, itemDescription: String, isItemFinished: Boolean) {
+    fun TaskItem(itemName: String, itemDescription: String, isItemFinished: Boolean) {
         Row(modifier = Modifier
             .height(100.dp)
             .fillMaxWidth()
             .padding(10.dp)
             .background(color = Color.Yellow)
         ){
-
-            Text("$itemId")
             Column(modifier = Modifier.fillMaxSize()) {
                 //dito yung designnn ng Task Item
                 //mga variables nyoo is itemId, itemName, itemDescription, tas isItemFinished
