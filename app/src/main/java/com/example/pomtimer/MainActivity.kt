@@ -21,6 +21,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -55,7 +56,7 @@ fun Main()  {
     var isRunning by remember { mutableStateOf(false) }
     var isPaused by remember { mutableStateOf(true) }
     val taskItemList = remember {mutableListOf<Task>()}
-    val progress by remember {mutableStateOf(taskItemList.size) }
+    val progress by remember {mutableStateOf(taskItemList.size)}
 
     val isPomodoroClicked = remember { mutableStateOf(false) }
     var isShortBreakClicked = remember { mutableStateOf(false) }
@@ -63,6 +64,7 @@ fun Main()  {
 
     var showDialog by remember { mutableStateOf(false)}
     var isRecomposeLocked by remember { mutableStateOf(true)}
+    var finishedTaskCount by remember { mutableStateOf(0) }
         LaunchedEffect(isRunning) {
         if (isRunning) {
             while (minutes > 0 || seconds > 0) {
@@ -76,6 +78,7 @@ fun Main()  {
             }
         }
     }
+
     if(showDialog){
         // callback function: bago lang to saken HAHAHA pero ayun imbis na
         // taskItemList.add (InputDialogView())
@@ -121,7 +124,6 @@ fun Main()  {
                         TextDecoration.None
                     }
                 )
-
                 Text(
                     text = "Short Break",
                     modifier = Modifier
@@ -171,12 +173,16 @@ fun Main()  {
                 Image(
                     painter = painterResource(R.drawable.small_sapling_level_3),
                     contentDescription = "Sample Image",
-                    modifier = Modifier.height(180.dp).width(180.dp)
+                    modifier = Modifier
+                        .height(120.dp)
+                        .width(120.dp)
                 )
 
                 // Show progress arc from 0-100 using Canvas
-                Canvas(modifier = Modifier.height(200.dp).width(200.dp)) {
-                    val strokeWidth = 8.dp.toPx()
+                Canvas(modifier = Modifier
+                    .height(150.dp)
+                    .width(150.dp)) {
+                    val strokeWidth = 4.dp.toPx()
                     val centerX = size.width / 2
                     val centerY = size.height / 2
                     val radius = (size.minDimension - strokeWidth) / 2
@@ -190,15 +196,17 @@ fun Main()  {
                         style = Stroke(strokeWidth)
                     )
 
-                    val sampleProgress = 75 // Example progress value (can be dynamic)
+                    // Example progress value (can be dynamic)
+                    if(taskItemList.size > 0 ){
+                        drawArc(
+                            color = Color(0, 204, 0),
+                            startAngle = startAngle,
+                            sweepAngle = ((finishedTaskCount / taskItemList.size).toFloat()) * 360f,
+                            useCenter = false,
+                            style = Stroke(strokeWidth)
+                        )
+                    }
 
-                    drawArc(
-                        color = Color.Blue,
-                        startAngle = startAngle,
-                        sweepAngle = (sampleProgress / 100f) * 360f,
-                        useCenter = false,
-                        style = Stroke(strokeWidth)
-                    )
                 }
             }
 
@@ -217,7 +225,7 @@ fun Main()  {
         Row(modifier = Modifier
             .fillMaxWidth()
             .align(alignment = Alignment.CenterHorizontally,), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            Text(text = "Tasks: 0/${taskItemList.size}")
+            Text(text = "Tasks: $finishedTaskCount/${taskItemList.size}")
             Button(onClick = {
                 if(!showDialog){
                     isRecomposeLocked = false
@@ -238,7 +246,12 @@ fun Main()  {
                         val scrollState = rememberScrollState()
                         Column (modifier = Modifier.verticalScroll(scrollState)){
                             for(i in taskItemList){
-                                TaskItem(itemName = i.getItemName(), itemDescription = i.getItemDescription(), isItemFinished = i.getIsItemFinished())
+                                TaskItem(itemName = i.getItemName(), itemDescription = i.getItemDescription(), isItemFinished = i.getIsItemFinished(),
+                                    isChecked = {
+                                        finishedTaskCount++
+                                }, isUnchecked = {
+                                    finishedTaskCount--
+                                })
                             }
                         }
                     }
@@ -304,14 +317,18 @@ class Task(itemName: String, itemDescription: String, isItemFinished: Boolean) {
     }
 }
     @Composable
-    fun TaskItem(itemName: String, itemDescription: String, isItemFinished: Boolean) {
+    fun TaskItem(itemName: String, itemDescription: String, isItemFinished: Boolean, isChecked: () -> Unit, isUnchecked: () -> Unit) {
+        var checkBoxState by remember { mutableStateOf(false) }
         Row(modifier = Modifier
             .height(100.dp)
             .fillMaxWidth()
             .padding(10.dp)
-            .background(color = Color.Yellow)
+            .background(color = Color.White, shape = RoundedCornerShape(10.dp))
+            .shadow(elevation = 2.dp, shape = RoundedCornerShape(2.dp),)
         ){
-            Column(modifier = Modifier.fillMaxSize()) {
+            Column(modifier = Modifier
+                .fillMaxSize()
+                .padding(5.dp)) {
                 //dito yung designnn ng Task Item
                 //mga variables nyoo is itemId, itemName, itemDescription, tas isItemFinished
                 //wag na pala yung itemId, di na magagamit yun, itemName na lang saka itemDescription saka isItemFinished
@@ -320,7 +337,21 @@ class Task(itemName: String, itemDescription: String, isItemFinished: Boolean) {
                 // tyy mga priiiiiii letsgooo
 
                 //cc: shaira & JC uwuuu
+                Row(modifier = Modifier.fillMaxHeight(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically){
+                    Checkbox(checked = checkBoxState, onCheckedChange = {
+                        checkBoxState = it
+                        if(checkBoxState){
+                            isChecked()
+                        }
+                        else{
 
+                        }
+                    }, colors = CheckboxDefaults.colors(checkedColor = Color(153, 77, 0), uncheckedColor = Color(0, 204, 0)))
+                    Column( modifier = Modifier.fillMaxHeight(), horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.Top) {
+                        Text(itemName,)
+                        Text(itemDescription)
+                    }
+                }
             }
         }
     }
@@ -343,18 +374,24 @@ fun InputDialogView(onDismiss: () -> Unit, onTaskCreated: (Task) -> Unit) {
                 Text(
                     text = "Enter the task title",
                     modifier = Modifier.padding(8.dp),
-                    fontSize = 20.sp
+                    fontSize = 16.sp
                 )
-                
-                OutlinedTextField(value = taskTitle, onValueChange = {
-                    taskTitle = it
-                },
-                    placeholder = { Text(text = "e.g. Feed my cat.") })
 
-                OutlinedTextField(value = taskDescription, onValueChange = {
-                    taskDescription = it
-                },
-                    placeholder = { Text(text = "e.g. once upon a time.") })
+                OutlinedTextField(modifier = Modifier.padding(8.dp),
+                    value = taskTitle, onValueChange = {
+                        taskTitle = it
+                    },
+                    placeholder = { Text(text = "e.g. Feed my cat.") })
+                Text(
+                    text = "Enter the task description",
+                    modifier = Modifier.padding(8.dp),
+                    fontSize = 16.sp
+                )
+                OutlinedTextField(modifier = Modifier.padding(8.dp),
+                    value = taskDescription, onValueChange = {
+                        taskDescription = it
+                    },
+                    placeholder = { Text(text = "e.g. Describe your task here.") })
                 Row {
                     OutlinedButton(
                         onClick = { onDismiss() },
@@ -387,6 +424,8 @@ fun InputDialogView(onDismiss: () -> Unit, onTaskCreated: (Task) -> Unit) {
 
 @Composable
 fun  MyImage(){
+    //implementation by Marc
+    //edited by: Anjo
     val img1 = "R.drawable.small_seed_level_0"
     val img2 = "R.drawable.small_sapling_level_1_1"
     val img3 = "R.drawable.small_sapling_level_2"
@@ -411,6 +450,5 @@ fun  MyImage(){
     else{
         Image(painter = painterResource(id = R.drawable.small_seed_level_0), contentDescription = "Image")
     }
-
 }
 
