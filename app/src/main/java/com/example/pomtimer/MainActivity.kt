@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
@@ -76,10 +77,16 @@ fun Main()  {
         }
     }
     if(showDialog){
+        // callback function: bago lang to saken HAHAHA pero ayun imbis na
+        // taskItemList.add (InputDialogView())
+        // iimplement na lang yung callback function (sa loob ng InputDialogView) para
+        // sa loob ng InputDialogView mattrack ung changes, hindi dito sa scope ng code na to.
+        // following the logic ( open dialog -> wait for input -> apply the output -> close the dialog)
+        // meaning mag-"recompose" lang sya kapag done na yung callback function
        InputDialogView(onDismiss = {
            showDialog = false
-       }, onTaskCreated = {task ->
-           taskItemList.add(task)
+       }, onTaskCreated = {
+               task -> taskItemList.add(task)
        })
     }
     MaterialTheme {
@@ -159,26 +166,47 @@ fun Main()  {
                     }
                 )
             }
-            Box(modifier = Modifier.height(200.dp)){
-                Canvas(
-                    modifier = Modifier
-                        .size(200.dp)
-                        .clip(CircleShape)
-                        .padding(8.dp)
-                ) {
-                    //dito banda yung tree growth algorithm eyy
-                    //tree growth based dun sa value ng progressbar
+            Box(modifier = Modifier.height(200.dp), contentAlignment = Alignment.Center) {
+                // Show a sample image
+                Image(
+                    painter = painterResource(R.drawable.small_sapling_level_3),
+                    contentDescription = "Sample Image",
+                    modifier = Modifier.height(180.dp).width(180.dp)
+                )
 
-                    //cc: marc
-                    val totalSeconds = minutes * 60 + seconds
+                // Show progress arc from 0-100 using Canvas
+                Canvas(modifier = Modifier.height(200.dp).width(200.dp)) {
+                    val strokeWidth = 8.dp.toPx()
+                    val centerX = size.width / 2
+                    val centerY = size.height / 2
+                    val radius = (size.minDimension - strokeWidth) / 2
+                    val startAngle = -90f
+
+                    drawArc(
+                        color = Color.Gray,
+                        startAngle = startAngle,
+                        sweepAngle = 360f,
+                        useCenter = false,
+                        style = Stroke(strokeWidth)
+                    )
+
+                    val sampleProgress = 75 // Example progress value (can be dynamic)
+
+                    drawArc(
+                        color = Color.Blue,
+                        startAngle = startAngle,
+                        sweepAngle = (sampleProgress / 100f) * 360f,
+                        useCenter = false,
+                        style = Stroke(strokeWidth)
+                    )
                 }
             }
+
             Row(
                 modifier = Modifier.padding(top = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                //dito banda yung progress bar, progress ng task list na nakacheck
-                //cc: anjo
+
                 Text(
                     text = "%02d:%02d".format(minutes, seconds),
                     fontSize = 48.sp,
