@@ -61,6 +61,7 @@ fun Main()  {
     val isLongBreakClicked = remember { mutableStateOf(false) }
 
     var showDialog by remember { mutableStateOf(false)}
+    var isRecomposeLocked by remember { mutableStateOf(true)}
         LaunchedEffect(isRunning) {
         if (isRunning) {
             while (minutes > 0 || seconds > 0) {
@@ -75,9 +76,11 @@ fun Main()  {
         }
     }
     if(showDialog){
-        InputDialogView {
-            showDialog = false
-        }
+       InputDialogView(onDismiss = {
+           showDialog = false
+       }, onTaskCreated = {task ->
+           taskItemList.add(task)
+       })
     }
     MaterialTheme {
         Column(
@@ -188,7 +191,15 @@ fun Main()  {
             .align(alignment = Alignment.CenterHorizontally,), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
             Text(text = "Tasks: 0/${taskItemList.size}")
             Button(onClick = {
-                showDialog = true
+                if(!showDialog){
+                    isRecomposeLocked = false
+                    showDialog = true
+                }
+                else{
+                    isRecomposeLocked = true
+                }
+
+
             }){
                 Text(text = "+")
             }
@@ -196,7 +207,12 @@ fun Main()  {
             Column(modifier = Modifier.fillMaxHeight()) {
                 Surface(modifier = Modifier.weight(1f)) {
                     Column(modifier = Modifier.fillMaxSize()) {
-                        TaskbarList(taskItemList = taskItemList)
+                        val scrollState = rememberScrollState()
+                        Column (modifier = Modifier.verticalScroll(scrollState)){
+                            for(i in taskItemList){
+                                TaskItem(itemName = i.getItemName(), itemDescription = i.getItemDescription(), isItemFinished = i.getIsItemFinished())
+                            }
+                        }
                     }
                 }
 
@@ -237,16 +253,6 @@ fun Main()  {
     }
 }
 
-@Composable
-    fun TaskbarList(taskItemList: List<Task>){
-        val scrollState = rememberScrollState()
-        Column (modifier = Modifier.verticalScroll(scrollState)){
-            for(i in taskItemList){
-                TaskItem(itemName = i.getItemName(), itemDescription = i.getItemDescription(), isItemFinished = i.getIsItemFinished())
-            }
-        }
-    }
-
 class Task(itemName: String, itemDescription: String, isItemFinished: Boolean) {
     private var itemName: String
     private var itemDescription: String
@@ -286,17 +292,14 @@ class Task(itemName: String, itemDescription: String, isItemFinished: Boolean) {
         }
     }
 @Composable
-fun InputDialogView(onDismiss:() -> Unit) {
+fun InputDialogView(onDismiss: () -> Unit, onTaskCreated: (Task) -> Unit) {
     val context = LocalContext.current
-    var taskTitle by remember {
-        mutableStateOf("")
-    }
+    var taskTitle by remember { mutableStateOf("") }
+    var taskDescription by remember { mutableStateOf("") }
 
     Dialog(onDismissRequest = { onDismiss() }) {
         Card(
-            //shape = MaterialTheme.shapes.medium,
             shape = RoundedCornerShape(10.dp),
-            // modifier = modifier.size(280.dp, 240.dp)
             modifier = Modifier.padding(8.dp),
             elevation = 8.dp
         ) {
@@ -304,19 +307,21 @@ fun InputDialogView(onDismiss:() -> Unit) {
                 Modifier
                     .background(Color.White)
             ) {
-
                 Text(
                     text = "Enter the task title",
                     modifier = Modifier.padding(8.dp),
                     fontSize = 20.sp
                 )
+                
+                OutlinedTextField(value = taskTitle, onValueChange = {
+                    taskTitle = it
+                },
+                    placeholder = { Text(text = "e.g. Feed my cat.") })
 
-                OutlinedTextField(
-                    value = taskTitle,
-                    onValueChange = { taskTitle = it }, modifier = Modifier.padding(8.dp),
-                    label = { Text("e.g. Feed my cat") }
-                )
-
+                OutlinedTextField(value = taskDescription, onValueChange = {
+                    taskDescription = it
+                },
+                    placeholder = { Text(text = "e.g. once upon a time.") })
                 Row {
                     OutlinedButton(
                         onClick = { onDismiss() },
@@ -328,12 +333,12 @@ fun InputDialogView(onDismiss:() -> Unit) {
                         Text(text = "Cancel")
                     }
 
-
                     Button(
                         onClick = {
-
-                            Toast.makeText(context, " \"$taskTitle\" added successfully!", Toast.LENGTH_SHORT).show()
-                            onDismiss() },
+                            val task = Task(itemName = taskTitle, taskDescription, false)
+                            onTaskCreated(task)
+                            onDismiss()
+                        },
                         Modifier
                             .fillMaxWidth()
                             .padding(8.dp)
@@ -342,12 +347,11 @@ fun InputDialogView(onDismiss:() -> Unit) {
                         Text(text = "Go")
                     }
                 }
-
-
             }
         }
     }
 }
+
 @Composable
 fun  MyImage(){
     val img1 = "R.drawable.small_seed_level_0"
