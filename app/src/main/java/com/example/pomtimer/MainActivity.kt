@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -38,6 +39,7 @@ import androidx.compose.ui.window.Dialog
 import kotlinx.coroutines.*
 import org.w3c.dom.Text
 import java.util.UUID
+import kotlin.math.absoluteValue
 
 class MainActivity : AppCompatActivity() {
 
@@ -56,7 +58,7 @@ fun Main()  {
     var isRunning by remember { mutableStateOf(false) }
     var isPaused by remember { mutableStateOf(true) }
     val taskItemList = remember {mutableListOf<Task>()}
-    val progress by remember {mutableStateOf(taskItemList.size)}
+
 
     val isPomodoroClicked = remember { mutableStateOf(false) }
     var isShortBreakClicked = remember { mutableStateOf(false) }
@@ -65,6 +67,9 @@ fun Main()  {
     var showDialog by remember { mutableStateOf(false)}
     var isRecomposeLocked by remember { mutableStateOf(true)}
     var finishedTaskCount by remember { mutableStateOf(0) }
+    val sweepAngleAnimate = ((finishedTaskCount.toFloat() / taskItemList.size.toFloat())) * 360f
+    val taskListSize = taskItemList.size
+
         LaunchedEffect(isRunning) {
         if (isRunning) {
             while (minutes > 0 || seconds > 0) {
@@ -170,13 +175,43 @@ fun Main()  {
             }
             Box(modifier = Modifier.height(200.dp), contentAlignment = Alignment.Center) {
                 // Show a sample image
-                Image(
-                    painter = painterResource(R.drawable.small_sapling_level_3),
-                    contentDescription = "Sample Image",
-                    modifier = Modifier
-                        .height(120.dp)
-                        .width(120.dp)
-                )
+                if((finishedTaskCount.toFloat() / taskItemList.size.toFloat()) <= .19f){
+                    Image(
+                        painter = painterResource(R.drawable.small_seed_level_0),
+                        contentDescription = "Sample Image",
+                        modifier = Modifier
+                            .height(120.dp)
+                            .width(120.dp)
+                    )
+                }
+                else if ((finishedTaskCount.toFloat() / taskItemList.size.toFloat()) >= .20f && (finishedTaskCount.toFloat() / taskItemList.size.toFloat()) <= .39f){
+                    Image(
+                        painter = painterResource(R.drawable.small_sapling_level_1_1),
+                        contentDescription = "Sample Image",
+                        modifier = Modifier
+                            .height(120.dp)
+                            .width(120.dp)
+                    )
+                }
+                else if ((finishedTaskCount.toFloat() / taskItemList.size.toFloat()) >= .40f && (finishedTaskCount.toFloat() / taskItemList.size.toFloat()) <= .59f){
+                    Image(
+                        painter = painterResource(R.drawable.small_sapling_level_2),
+                        contentDescription = "Sample Image",
+                        modifier = Modifier
+                            .height(120.dp)
+                            .width(120.dp)
+                    )
+                }
+                else{
+                    Image(
+                        painter = painterResource(R.drawable.ic_launcher_foreground),
+                        contentDescription = "Sample Image",
+                        modifier = Modifier
+                            .height(120.dp)
+                            .width(120.dp)
+                    )
+                }
+
 
                 // Show progress arc from 0-100 using Canvas
                 Canvas(modifier = Modifier
@@ -198,10 +233,11 @@ fun Main()  {
 
                     // Example progress value (can be dynamic)
                     if(taskItemList.size > 0 ){
+
                         drawArc(
                             color = Color(0, 204, 0),
                             startAngle = startAngle,
-                            sweepAngle = ((finishedTaskCount / taskItemList.size).toFloat()) * 360f,
+                            sweepAngle = sweepAngleAnimate,
                             useCenter = false,
                             style = Stroke(strokeWidth)
                         )
@@ -281,7 +317,7 @@ fun Main()  {
                             .fillMaxWidth()
                     ) {
                         Text(
-                            text = "START",
+                            text = "START ${(finishedTaskCount.toFloat() / taskItemList.size.toFloat())}",
                             color = Color.White,
                             style = TextStyle(shadow = Shadow(color = Color.Black, blurRadius = 5f)),
                             fontWeight = FontWeight.Bold
@@ -344,10 +380,12 @@ class Task(itemName: String, itemDescription: String, isItemFinished: Boolean) {
                             isChecked()
                         }
                         else{
-
+                            isUnchecked()
                         }
                     }, colors = CheckboxDefaults.colors(checkedColor = Color(153, 77, 0), uncheckedColor = Color(0, 204, 0)))
-                    Column( modifier = Modifier.fillMaxHeight(), horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.Top) {
+                    Column( modifier = Modifier
+                        .fillMaxHeight()
+                        .padding(12.dp), horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.Top ) {
                         Text(itemName,)
                         Text(itemDescription)
                     }
