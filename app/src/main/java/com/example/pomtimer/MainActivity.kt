@@ -68,9 +68,9 @@ fun Main()  {
     var isRecomposeLocked by remember { mutableStateOf(true)}
     var finishedTaskCount by remember { mutableStateOf(0) }
     val sweepAngleAnimate = ((finishedTaskCount.toFloat() / taskItemList.size.toFloat())) * 360f
-    val taskListSize = taskItemList.size
+    var taskListSize = taskItemList.size
 
-        LaunchedEffect(isRunning) {
+    LaunchedEffect(isRunning) {
         if (isRunning) {
             while (minutes > 0 || seconds > 0) {
                 delay(1000)
@@ -177,7 +177,7 @@ fun Main()  {
                 // Show a sample image
                 if((finishedTaskCount.toFloat() / taskItemList.size.toFloat()) <= .19f){
                     Image(
-                        painter = painterResource(R.drawable.small_seed_level_0),
+                        painter = painterResource(R.drawable.tree_growth_0),
                         contentDescription = "Sample Image",
                         modifier = Modifier
                             .height(120.dp)
@@ -186,7 +186,7 @@ fun Main()  {
                 }
                 else if ((finishedTaskCount.toFloat() / taskItemList.size.toFloat()) >= .20f && (finishedTaskCount.toFloat() / taskItemList.size.toFloat()) <= .39f){
                     Image(
-                        painter = painterResource(R.drawable.small_sapling_level_1_1),
+                        painter = painterResource(R.drawable.tree_growth_1),
                         contentDescription = "Sample Image",
                         modifier = Modifier
                             .height(120.dp)
@@ -195,7 +195,25 @@ fun Main()  {
                 }
                 else if ((finishedTaskCount.toFloat() / taskItemList.size.toFloat()) >= .40f && (finishedTaskCount.toFloat() / taskItemList.size.toFloat()) <= .59f){
                     Image(
-                        painter = painterResource(R.drawable.small_sapling_level_2),
+                        painter = painterResource(R.drawable.tree_growth_2),
+                        contentDescription = "Sample Image",
+                        modifier = Modifier
+                            .height(120.dp)
+                            .width(120.dp)
+                    )
+                }
+                else if ((finishedTaskCount.toFloat() / taskItemList.size.toFloat()) >= .60f && (finishedTaskCount.toFloat() / taskItemList.size.toFloat()) <= .79f){
+                    Image(
+                        painter = painterResource(R.drawable.tree_growth_3),
+                        contentDescription = "Sample Image",
+                        modifier = Modifier
+                            .height(120.dp)
+                            .width(120.dp)
+                    )
+                }
+                else if ((finishedTaskCount.toFloat() / taskItemList.size.toFloat()) >= .80f && (finishedTaskCount.toFloat() / taskItemList.size.toFloat()) <= 1f){
+                    Image(
+                        painter = painterResource(R.drawable.tree_growth_4),
                         contentDescription = "Sample Image",
                         modifier = Modifier
                             .height(120.dp)
@@ -204,7 +222,7 @@ fun Main()  {
                 }
                 else{
                     Image(
-                        painter = painterResource(R.drawable.ic_launcher_foreground),
+                        painter = painterResource(R.drawable.tree_growth_default),
                         contentDescription = "Sample Image",
                         modifier = Modifier
                             .height(120.dp)
@@ -260,8 +278,13 @@ fun Main()  {
         }
         Row(modifier = Modifier
             .fillMaxWidth()
-            .align(alignment = Alignment.CenterHorizontally,), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            Text(text = "Tasks: $finishedTaskCount/${taskItemList.size}")
+            .align(
+                alignment = Alignment.CenterHorizontally,),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+
+        ) {
+            Text(text = "Tasks: $finishedTaskCount/${taskItemList.size}", fontWeight = FontWeight.Bold, )
             Button(onClick = {
                 if(!showDialog){
                     isRecomposeLocked = false
@@ -272,7 +295,8 @@ fun Main()  {
                 }
 
 
-            }){
+            },
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0, 204, 0)),){
                 Text(text = "+")
             }
         }
@@ -317,7 +341,7 @@ fun Main()  {
                             .fillMaxWidth()
                     ) {
                         Text(
-                            text = "START ${(finishedTaskCount.toFloat() / taskItemList.size.toFloat())}",
+                            text = "START",
                             color = Color.White,
                             style = TextStyle(shadow = Shadow(color = Color.Black, blurRadius = 5f)),
                             fontWeight = FontWeight.Bold
