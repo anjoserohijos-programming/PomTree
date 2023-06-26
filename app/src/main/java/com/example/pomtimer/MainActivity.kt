@@ -286,6 +286,11 @@ class Task(itemName: String, itemDescription: String, isItemFinished: Boolean) {
             Column(modifier = Modifier.fillMaxSize()) {
                 //dito yung designnn ng Task Item
                 //mga variables nyoo is itemId, itemName, itemDescription, tas isItemFinished
+                //wag na pala yung itemId, di na magagamit yun, itemName na lang saka itemDescription saka isItemFinished
+                //bale combine lang dito ng checkbox, itemName sa taas, tas itemDescription sa baba HAHAHAH
+                //sesend ako itsura sa messenger haha
+                // tyy mga priiiiiii letsgooo
+
                 //cc: shaira & JC uwuuu
 
             }
